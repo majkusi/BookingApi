@@ -6,6 +6,8 @@ import com.majkusi.booking_api.domain.MemberStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,6 +37,13 @@ public class MemberService {
 
     public Optional< MemberResponse > getById( Long id ) {
         return Optional.ofNullable( members.get( id ) ).map( this::toResponse );
+    }
+
+    public List< MemberResponse > getMembers( ) {
+        List< MemberResponse > responseMembers = new ArrayList<>( );
+        for ( Member member : members.values( ) )
+            responseMembers.add( toResponse( member ) );
+        return responseMembers;
     }
 
 
