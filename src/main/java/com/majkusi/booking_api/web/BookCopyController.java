@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping( "/books" )
@@ -20,9 +19,8 @@ public class BookCopyController {
 
     @PostMapping( "/{bookId}/copies" )
     @ResponseStatus( HttpStatus.CREATED )
-    public Optional< BookCopyResponse > addBookCopy( @PathVariable Long bookId ) {
-        bookCopyService.create( bookId );
-        return bookCopyService.getById( bookId );
+    public BookCopyResponse addBookCopy( @PathVariable Long bookId ) {
+        return bookCopyService.create( bookId );
     }
 
     @GetMapping( "/{bookId}/copies" )
