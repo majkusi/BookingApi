@@ -30,8 +30,8 @@ public class BookCopyService {
         return bookCopies.values( ).stream( ).filter( b -> Objects.equals( b.bookId( ), id ) ).map( this::toResponse ).toList( );
     }
 
-    public Optional< BookCopy > getById( Long id ) {
-        return Optional.ofNullable( bookCopies.get( id ) );
+    public Optional< BookCopyResponse > getById( Long id ) {
+        return Optional.ofNullable( bookCopies.get( id ) ).map( this::toResponse );
     }
 
     private BookCopyResponse toResponse( BookCopy bookCopy ) {
