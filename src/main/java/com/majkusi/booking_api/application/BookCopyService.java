@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,6 +28,10 @@ public class BookCopyService {
 
     public List< BookCopyResponse > getBookById( Long id ) {
         return bookCopies.values( ).stream( ).filter( b -> Objects.equals( b.bookId( ), id ) ).map( this::toResponse ).toList( );
+    }
+
+    public Optional< BookCopy > getById( Long id ) {
+        return Optional.ofNullable( bookCopies.get( id ) );
     }
 
     private BookCopyResponse toResponse( BookCopy bookCopy ) {
