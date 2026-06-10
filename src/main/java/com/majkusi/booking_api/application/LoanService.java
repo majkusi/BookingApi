@@ -1,8 +1,12 @@
 package com.majkusi.booking_api.application;
 
+import com.majkusi.booking_api.application.dto.BookCopyResponse;
 import com.majkusi.booking_api.application.dto.LoanResponse;
 import com.majkusi.booking_api.application.dto.MemberResponse;
-import com.majkusi.booking_api.domain.BookCopy;
+import com.majkusi.booking_api.application.exception.BookCopyAlreadyLoanedException;
+import com.majkusi.booking_api.application.exception.LoanLimitExceededException;
+import com.majkusi.booking_api.application.exception.MemberHasOverdueException;
+import com.majkusi.booking_api.application.exception.MemberSuspendedException;
 import com.majkusi.booking_api.domain.BookStatus;
 import com.majkusi.booking_api.domain.Loan;
 import com.majkusi.booking_api.domain.MemberStatus;
@@ -27,14 +31,16 @@ public class LoanService {
     }
 
     public LoanResponse create( Long bookCopyId, Long memberId ) {
-        BookCopy bookCopy = bookCopyService.getById( bookCopyId ).orElseThrow( );
+        BookCopyResponse bookCopy = bookCopyService.getById( bookCopyId ).orElseThrow( );
         MemberResponse member = memberService.getById( memberId ).orElseThrow( );
         if ( bookCopy.status( ) != BookStatus.AVAILABLE ) {
-            throw new RuntimeException( "Book is not available at the moment" );
-        } else if ( member.status( ) == MemberStatus.SUSPENDED || checkUserOverdue( memberId ) ) {
-            throw new RuntimeException( "Member is incorrect" );
+            throw new BookCopyAlreadyLoanedException( "Book is not available at the moment" );
+        } else if ( member.status( ) == MemberStatus.SUSPENDED ) {
+            throw new MemberSuspendedException( "Member is incorrect" );
+        } else if ( checkUserOverdue( memberId ) ) {
+            throw new MemberHasOverdueException( "Member has overdue books!" );
         } else if ( checkUserBooks( memberId ) ) {
-            throw new RuntimeException( "User has too many book loaned" );
+            throw new LoanLimitExceededException( "Member has too many book loaned" );
         }
         Loan loan = add( bookCopyId, memberId );
         return toResponse( loan );
