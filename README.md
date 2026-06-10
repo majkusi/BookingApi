@@ -25,13 +25,13 @@ Open the project in IntelliJ and run `BookingApiApplication`. The server starts 
 
 ### Books
 
-| Method | Endpoint             | Description           |
-|--------|----------------------|-----------------------|
-| GET    | `/books`             | List all books        |
-| GET    | `/books/{id}`        | Get book by ID        |
-| POST   | `/books`             | Add a new book        |
-| GET    | `/books/{id}/copies` | List copies of a book |
-| POST   | `/books/{id}/copies` | Add a physical copy   |
+| Method | Endpoint             | Description                 |
+|--------|----------------------|-----------------------------|
+| GET    | `/books`             | List all books              |
+| GET    | `/books/{id}`        | Get bookEntity by ID        |
+| POST   | `/books`             | Add a new bookEntity        |
+| GET    | `/books/{id}/copies` | List copies of a bookEntity |
+| POST   | `/books/{id}/copies` | Add a physical copy         |
 
 ### Members
 
@@ -42,10 +42,10 @@ Open the project in IntelliJ and run `BookingApiApplication`. The server starts 
 
 ### Loans
 
-| Method | Endpoint             | Description            |
-|--------|----------------------|------------------------|
-| POST   | `/loans`             | Borrow a book copy     |
-| POST   | `/loans/{id}/return` | Return a borrowed copy |
+| Method | Endpoint             | Description              |
+|--------|----------------------|--------------------------|
+| POST   | `/loans`             | Borrow a bookEntity copy |
+| POST   | `/loans/{id}/return` | Return a borrowed copy   |
 
 ## Business rules
 

@@ -1,54 +1,39 @@
 package com.majkusi.booking_api.application;
 
 import com.majkusi.booking_api.application.dto.BookResponse;
-import com.majkusi.booking_api.domain.Book;
+import com.majkusi.booking_api.domain.entity.BookEntity;
+import com.majkusi.booking_api.instastructure.BookRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class BookService {
-    private final Map< Long, Book > books = new ConcurrentHashMap<>( );
-    private final AtomicLong idGenerator = new AtomicLong( );
+    private final BookRepository bookRepository;
 
-    public BookService( ) {
-        add( new Book( null, "Atomic Habits", 326, "James Clear", "GALAKTYKA" ) );
-        add( new Book( null, "Courage", 452, "Ryan Holiday", "Test" ) );
-        add( new Book( null, "Meditations", 120, "Marcus Aurelius", "Test" ) );
+    public BookService( BookRepository bookRepository ) {
+        this.bookRepository = bookRepository;
     }
 
     public BookResponse create( String title, int pages, String author, String publisher ) {
-        Book book = new Book( null, title, pages, author, publisher );
-        Book saved = add( book );
+        BookEntity bookEntity = new BookEntity( title, pages, author, publisher );
+        BookEntity saved = bookRepository.save( bookEntity );
         return toResponse( saved );
     }
 
     public Optional< BookResponse > getById( Long id ) {
-        return Optional.ofNullable( books.get( id ) ).map( this::toResponse );
+        return bookRepository.findById( id ).map( this::toResponse );
     }
 
     public List< BookResponse > getAllAsResponse( ) {
-        return getAll( ).stream( )
+        return bookRepository.findAll( ).stream( )
                 .map( this::toResponse )
                 .toList( );
     }
 
-    private BookResponse toResponse( Book book ) {
-        return new BookResponse( book.id( ), book.title( ), book.pages( ), book.author( ), book.publisher( ) );
+    private BookResponse toResponse( BookEntity bookEntity ) {
+        return new BookResponse( bookEntity.getId( ), bookEntity.getTitle( ), bookEntity.getPages( ), bookEntity.getAuthor( ), bookEntity.getPublisher( ) );
     }
 
-    private List< Book > getAll( ) {
-        return List.copyOf( books.values( ) );
-    }
-
-    private Book add( Book book ) {
-        Long id = idGenerator.getAndIncrement( );
-        Book bookWithId = new Book( id, book.title( ), book.pages( ), book.author( ), book.publisher( ) );
-        books.put( id, bookWithId );
-        return bookWithId;
-    }
 }
