@@ -1,49 +1,40 @@
 package com.majkusi.booking_api.application;
 
 import com.majkusi.booking_api.application.dto.MemberResponse;
-import com.majkusi.booking_api.domain.Member;
 import com.majkusi.booking_api.domain.MemberStatus;
+import com.majkusi.booking_api.domain.entity.MemberEntity;
+import com.majkusi.booking_api.instastructure.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class MemberService {
-    private final Map< Long, Member > members = new ConcurrentHashMap<>( );
-    private final AtomicLong idGenerator = new AtomicLong( );
+    private final MemberRepository memberRepository;
 
-    public MemberService( ) {
+    public MemberService( MemberRepository memberRepository ) {
+        this.memberRepository = memberRepository;
 
     }
 
     public MemberResponse create( String name, String email ) {
-        Member member = new Member( null, name, email, LocalDate.now( ), MemberStatus.ACTIVE );
-        Member saved = add( member );
+        MemberEntity member = new MemberEntity( name, email, LocalDate.now( ), MemberStatus.ACTIVE );
+        MemberEntity saved = memberRepository.save( member );
         return toResponse( saved );
     }
 
-    private Member add( Member member ) {
-        Long id = idGenerator.getAndIncrement( );
-        Member memberWithId = new Member( id, member.name( ), member.email( ), member.registerDate( ), member.status( ) );
-        members.put( id, memberWithId );
-        return memberWithId;
-    }
-
     public Optional< MemberResponse > getById( Long id ) {
-        return Optional.ofNullable( members.get( id ) ).map( this::toResponse );
+        return memberRepository.findById( id ).map( this::toResponse );
     }
 
     public List< MemberResponse > getMembers( ) {
-        return members.values( ).stream( ).map( this::toResponse ).toList( );
+        return memberRepository.findAll( ).stream( ).map( this::toResponse ).toList( );
     }
 
-    private MemberResponse toResponse( Member member ) {
-        return new MemberResponse( member.id( ), member.name( ), member.email( ), member.registerDate( ), member.status( ) );
+    private MemberResponse toResponse( MemberEntity member ) {
+        return new MemberResponse( member.getId( ), member.getName( ), member.getEmail( ), member.getRegisterDate( ), member.getStatus( ) );
     }
 
 

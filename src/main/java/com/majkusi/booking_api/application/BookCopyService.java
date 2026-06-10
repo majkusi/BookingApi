@@ -3,7 +3,7 @@ package com.majkusi.booking_api.application;
 import com.majkusi.booking_api.application.dto.BookCopyResponse;
 import com.majkusi.booking_api.domain.BookStatus;
 import com.majkusi.booking_api.domain.entity.BookCopyEntity;
-import com.majkusi.booking_api.instastructure.BookCopyRepository;
+import com.majkusi.booking_api.instastructure.repository.BookCopyRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

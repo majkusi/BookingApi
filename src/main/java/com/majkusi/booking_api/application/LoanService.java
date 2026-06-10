@@ -8,26 +8,24 @@ import com.majkusi.booking_api.application.exception.LoanLimitExceededException;
 import com.majkusi.booking_api.application.exception.MemberHasOverdueException;
 import com.majkusi.booking_api.application.exception.MemberSuspendedException;
 import com.majkusi.booking_api.domain.BookStatus;
-import com.majkusi.booking_api.domain.Loan;
 import com.majkusi.booking_api.domain.MemberStatus;
+import com.majkusi.booking_api.domain.entity.LoanEntity;
+import com.majkusi.booking_api.instastructure.repository.LoanRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class LoanService {
     private final MemberService memberService;
     private final BookCopyService bookCopyService;
-    private final AtomicLong idGenerator = new AtomicLong( );
-    private final Map< Long, Loan > loans = new ConcurrentHashMap<>( );
+    private final LoanRepository loanRepository;
 
-    public LoanService( MemberService memberService, BookCopyService bookCopyService ) {
+    public LoanService( MemberService memberService, BookCopyService bookCopyService, LoanRepository loanRepository ) {
         this.memberService = memberService;
         this.bookCopyService = bookCopyService;
+        this.loanRepository = loanRepository;
     }
 
     public LoanResponse create( Long bookCopyId, Long memberId ) {
@@ -42,35 +40,32 @@ public class LoanService {
         } else if ( checkUserBooks( memberId ) ) {
             throw new LoanLimitExceededException( "Member has too many book loaned" );
         }
-        Loan loan = add( bookCopyId, memberId );
+        LoanEntity loan = save( bookCopyId, memberId );
         return toResponse( loan );
     }
 
     public LoanResponse returnLoan( Long loanId ) {
-        Loan loan = Optional.ofNullable( loans.get( loanId ) ).orElseThrow( );
-        Loan newLoan = new Loan( loan.id( ), loan.bookCopyId( ), loan.memberId( ), loan.startDate( ), loan.dueDate( ), Optional.of( LocalDate.now( ) ) );
-        loans.put( loanId, newLoan );
-        return toResponse( newLoan );
+        LoanEntity loan = loanRepository.findById( loanId ).orElseThrow( );
+        loan.setReturnDate( LocalDate.now( ) );
+        loanRepository.save( loan );
+        return toResponse( loan );
     }
 
     private boolean checkUserBooks( Long memberId ) {
-        long loanedBooks = loans.values( ).stream( ).filter( l -> l.memberId( ).equals( memberId ) && l.returnDate( ).isEmpty( ) ).count( );
+        long loanedBooks = loanRepository.findLoanEntitiesByMemberId( memberId ).stream( ).filter( l -> l.getReturnDate( ) == null ).count( );
         return loanedBooks >= 5;
     }
 
     private boolean checkUserOverdue( Long memberId ) {
-        long overdue = loans.values( ).stream( ).filter( l -> l.memberId( ).equals( memberId ) && LocalDate.now( ).isAfter( l.dueDate( ) ) && l.returnDate( ).isEmpty( ) ).count( );
+        long overdue = loanRepository.findLoanEntitiesByMemberId( memberId ).stream( ).filter( l -> LocalDate.now( ).isAfter( l.getDueDate( ) ) && l.getReturnDate( ) == null ).count( );
         return overdue >= 1;
     }
 
-    private Loan add( Long bookCopyId, Long memberId ) {
-        long id = idGenerator.getAndIncrement( );
-        Loan loanWithId = new Loan( id, bookCopyId, memberId, LocalDate.now( ), LocalDate.now( ).plusWeeks( 2 ), Optional.empty( ) );
-        loans.put( id, loanWithId );
-        return loanWithId;
+    private LoanEntity save( Long bookCopyId, Long memberId ) {
+        return loanRepository.save( new LoanEntity( bookCopyId, memberId, LocalDate.now( ), LocalDate.now( ).plusWeeks( 2 ), null ) );
     }
 
-    private LoanResponse toResponse( Loan loan ) {
-        return new LoanResponse( loan.id( ), loan.bookCopyId( ), loan.memberId( ), loan.startDate( ), loan.dueDate( ), loan.returnDate( ) );
+    private LoanResponse toResponse( LoanEntity loan ) {
+        return new LoanResponse( loan.getId( ), loan.getBookCopyId( ), loan.getMemberId( ), loan.getStartDate( ), loan.getDueDate( ), Optional.ofNullable( loan.getReturnDate( ) ) );
     }
 }

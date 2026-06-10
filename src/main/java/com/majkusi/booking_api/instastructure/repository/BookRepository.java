@@ -1,4 +1,4 @@
-package com.majkusi.booking_api.instastructure;
+package com.majkusi.booking_api.instastructure.repository;
 
 import com.majkusi.booking_api.domain.entity.BookEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
