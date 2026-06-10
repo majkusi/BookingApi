@@ -18,7 +18,8 @@ until the issue is resolved.
 
 ## Running locally
 
-Open the project in IntelliJ and run `BookingApiApplication`. The server starts on `http://localhost:8080`.
+Open the project in IntelliJ and run `BookingApiApplication`. The server starts on
+`http://localhost:8080`.
 
 ## API
 
