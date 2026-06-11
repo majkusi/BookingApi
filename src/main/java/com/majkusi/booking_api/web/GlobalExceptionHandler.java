@@ -1,9 +1,6 @@
 package com.majkusi.booking_api.web;
 
-import com.majkusi.booking_api.application.exception.BookCopyAlreadyLoanedException;
-import com.majkusi.booking_api.application.exception.LoanLimitExceededException;
-import com.majkusi.booking_api.application.exception.MemberHasOverdueException;
-import com.majkusi.booking_api.application.exception.MemberSuspendedException;
+import com.majkusi.booking_api.application.exception.*;
 import com.majkusi.booking_api.web.dto.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,5 +41,15 @@ public class GlobalExceptionHandler {
     @ExceptionHandler( MethodArgumentNotValidException.class )
     public ResponseEntity< ErrorResponse > handleConflictMethodArgumentNotValidException( MethodArgumentNotValidException ex ) {
         return new ResponseEntity<>( new ErrorResponse( ex.getBindingResult( ).getFieldErrors( ).get( 0 ).getDefaultMessage( ) ), HttpStatus.BAD_REQUEST );
+    }
+
+    @ExceptionHandler( BookNotFoundException.class )
+    public ResponseEntity< ErrorResponse > handleConflictBookNotFoundException( BookNotFoundException ex ) {
+        return new ResponseEntity<>( new ErrorResponse( ex.getMessage( ) ), HttpStatus.NOT_FOUND );
+    }
+
+    @ExceptionHandler( MemberNotFoundException.class )
+    public ResponseEntity< ErrorResponse > handleConflictMemberNotFoundException( MemberNotFoundException ex ) {
+        return new ResponseEntity<>( new ErrorResponse( ex.getMessage( ) ), HttpStatus.NOT_FOUND );
     }
 }

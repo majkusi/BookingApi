@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface LoanRepository extends JpaRepository< LoanEntity, Long > {
-    List< LoanEntity > findLoanEntitiesByMemberId( Long memberId );
+    List< LoanEntity > findByMember_Id( Long memberId );
 }
