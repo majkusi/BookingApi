@@ -11,6 +11,7 @@ import com.majkusi.booking_api.instastructure.repository.BookCopyRepository;
 import com.majkusi.booking_api.instastructure.repository.LoanRepository;
 import com.majkusi.booking_api.instastructure.repository.MemberRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -27,6 +28,7 @@ public class LoanService {
         this.loanRepository = loanRepository;
     }
 
+    @Transactional
     public LoanResponse create( Long bookCopyId, Long memberId ) {
         BookCopyEntity bookCopy = bookCopyRepository.findById( bookCopyId ).orElseThrow( ( ) -> new BookNotFoundException( "Book copy not found, check ID" ) );
         MemberEntity member = memberRepository.findById( memberId ).orElseThrow( ( ) -> new MemberNotFoundException( "Member not found" ) );
@@ -40,29 +42,25 @@ public class LoanService {
             throw new LoanLimitExceededException( "Member has too many book loaned" );
         }
         bookCopy.setStatus( BookStatus.LOANED );
-        bookCopyRepository.save( bookCopy );
         LoanEntity loan = save( bookCopy, member );
         return toResponse( loan );
     }
 
+    @Transactional
     public LoanResponse returnLoan( Long loanId ) {
         LoanEntity loan = loanRepository.findById( loanId ).orElseThrow( );
         loan.setReturnDate( LocalDate.now( ) );
         BookCopyEntity bookCopy = loan.getBookCopy( );
         bookCopy.setStatus( BookStatus.RETURNED );
-        bookCopyRepository.save( bookCopy );
-        loanRepository.save( loan );
         return toResponse( loan );
     }
 
     private boolean checkUserBooks( Long memberId ) {
-        long loanedBooks = loanRepository.findByMember_Id( memberId ).stream( ).filter( l -> l.getReturnDate( ) == null ).count( );
-        return loanedBooks >= 5;
+        return loanRepository.checkUserBooks( memberId ) >= 5;
     }
 
     private boolean checkUserOverdue( Long memberId ) {
-        long overdue = loanRepository.findByMember_Id( memberId ).stream( ).filter( l -> LocalDate.now( ).isAfter( l.getDueDate( ) ) && l.getReturnDate( ) == null ).count( );
-        return overdue >= 1;
+        return loanRepository.checkUserOverdue( memberId, LocalDate.now( ) ) >= 1;
     }
 
     private LoanEntity save( BookCopyEntity bookCopy, MemberEntity member ) {
@@ -70,6 +68,6 @@ public class LoanService {
     }
 
     private LoanResponse toResponse( LoanEntity loan ) {
-        return new LoanResponse( loan.getId( ), loan.getBookCopy( ), loan.getMember( ), loan.getStartDate( ), loan.getDueDate( ), Optional.ofNullable( loan.getReturnDate( ) ) );
+        return new LoanResponse( loan.getId( ), loan.getBookCopy( ).getId( ), loan.getMember( ).getId( ), loan.getStartDate( ), loan.getDueDate( ), Optional.ofNullable( loan.getReturnDate( ) ) );
     }
 }
