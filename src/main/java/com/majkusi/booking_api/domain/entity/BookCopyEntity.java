@@ -9,12 +9,14 @@ public class BookCopyEntity {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
     Long id;
-    Long bookId;
+    @ManyToOne
+    @JoinColumn( name = "book_id", referencedColumnName = "id" )
+    BookEntity book;
     @Enumerated( EnumType.STRING )
     BookStatus status;
 
-    public BookCopyEntity( Long bookId, BookStatus status ) {
-        this.bookId = bookId;
+    public BookCopyEntity( BookEntity book, BookStatus status ) {
+        this.book = book;
         this.status = status;
     }
 
@@ -25,11 +27,15 @@ public class BookCopyEntity {
         return id;
     }
 
-    public Long getBookId( ) {
-        return bookId;
+    public BookEntity getBook( ) {
+        return book;
     }
 
     public BookStatus getStatus( ) {
         return status;
+    }
+
+    public void setStatus( BookStatus status ) {
+        this.status = status;
     }
 }

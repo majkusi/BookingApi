@@ -11,16 +11,20 @@ public class LoanEntity {
     @Id
     @GeneratedValue( strategy = GenerationType.IDENTITY )
     Long id;
-    Long bookCopyId;
-    Long memberId;
+    @ManyToOne
+    @JoinColumn( name = "book_copy_id", referencedColumnName = "id" )
+    BookCopyEntity bookCopy;
+    @ManyToOne
+    @JoinColumn( name = "member_id", referencedColumnName = "id" )
+    MemberEntity member;
     LocalDate startDate;
     LocalDate dueDate;
     @Column( nullable = true )
     LocalDate returnDate;
 
-    public LoanEntity( Long bookCopyId, Long memberId, LocalDate startDate, LocalDate dueDate, @Nullable LocalDate returnDate ) {
-        this.bookCopyId = bookCopyId;
-        this.memberId = memberId;
+    public LoanEntity( BookCopyEntity bookCopy, MemberEntity member, LocalDate startDate, LocalDate dueDate, @Nullable LocalDate returnDate ) {
+        this.bookCopy = bookCopy;
+        this.member = member;
         this.startDate = startDate;
         this.dueDate = dueDate;
         this.returnDate = returnDate;
@@ -33,12 +37,12 @@ public class LoanEntity {
         return id;
     }
 
-    public Long getBookCopyId( ) {
-        return bookCopyId;
+    public BookCopyEntity getBookCopy( ) {
+        return bookCopy;
     }
 
-    public Long getMemberId( ) {
-        return memberId;
+    public MemberEntity getMember( ) {
+        return member;
     }
 
     public LocalDate getStartDate( ) {
