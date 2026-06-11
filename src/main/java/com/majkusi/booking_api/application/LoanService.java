@@ -30,7 +30,7 @@ public class LoanService {
 
     @Transactional
     public LoanResponse create( Long bookCopyId, Long memberId ) {
-        BookCopyEntity bookCopy = bookCopyRepository.findById( bookCopyId ).orElseThrow( ( ) -> new BookNotFoundException( "Book copy not found, check ID" ) );
+        BookCopyEntity bookCopy = bookCopyRepository.findByIdWithLock( bookCopyId ).orElseThrow( ( ) -> new BookNotFoundException( "Book copy not found, check ID" ) );
         MemberEntity member = memberRepository.findById( memberId ).orElseThrow( ( ) -> new MemberNotFoundException( "Member not found" ) );
         if ( bookCopy.getStatus( ) != BookStatus.AVAILABLE ) {
             throw new BookCopyAlreadyLoanedException( "Book is not available at the moment" );
