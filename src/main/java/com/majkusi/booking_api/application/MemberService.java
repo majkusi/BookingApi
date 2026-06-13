@@ -1,12 +1,10 @@
 package com.majkusi.booking_api.application;
 
 import com.majkusi.booking_api.application.dto.MemberResponse;
-import com.majkusi.booking_api.domain.MemberStatus;
 import com.majkusi.booking_api.domain.entity.MemberEntity;
 import com.majkusi.booking_api.instastructure.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,12 +15,6 @@ public class MemberService {
     public MemberService( MemberRepository memberRepository ) {
         this.memberRepository = memberRepository;
 
-    }
-
-    public MemberResponse create( String name, String email ) {
-        MemberEntity member = new MemberEntity( name, email, LocalDate.now( ), MemberStatus.ACTIVE );
-        MemberEntity saved = memberRepository.save( member );
-        return toResponse( saved );
     }
 
     public Optional< MemberResponse > getById( Long id ) {

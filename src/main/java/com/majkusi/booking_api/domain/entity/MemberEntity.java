@@ -16,17 +16,26 @@ public class MemberEntity {
     LocalDate registerDate;
     @Enumerated( EnumType.STRING )
     MemberStatus status;
+    String password;
 
     protected MemberEntity( ) {
     }
 
-    public MemberEntity( String name, String email, LocalDate registerDate, MemberStatus status ) {
+    public MemberEntity( String name, String email, String password, LocalDate registerDate, MemberStatus status ) {
         this.name = name;
         this.email = email;
         this.registerDate = registerDate;
         this.status = status;
+        this.password = password;
     }
 
+    public String getPassword( ) {
+        return password;
+    }
+
+    public void setPassword( String password ) {
+        this.password = password;
+    }
 
     public Long getId( ) {
         return id;
